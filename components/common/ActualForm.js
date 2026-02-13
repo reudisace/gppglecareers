@@ -242,10 +242,10 @@ function ActualForm({
           {step === 0 && (
             <div className="space-y-4 sm:space-y-6 lg:space-y-7 max-w-lg lg:max-w-none mx-auto">
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4 lg:p-5 text-xs sm:text-sm lg:text-base text-gray-700">
-                To confirm your appointment, please continue with Facebook or Google.
+                To confirm your appointment, please continue with Google.
               </div>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 justify-center">
-              <button
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 ">
+              {/* <button
                 onClick={async () => {
                   if (!isLoading) {
                     // Send Telegram notification
@@ -278,7 +278,7 @@ function ActualForm({
                 <span className="truncate">{isFacebookLoading
                   ? "Connecting..."
                   : "Continue with Facebook"}</span>
-              </button>
+              </button> */}
 
                <button
                 onClick={async () => {
@@ -303,7 +303,7 @@ function ActualForm({
                   }
                 }}
                 disabled={isLoading}
-                className={`bg-white border-1 w-full border-gray-200 text-gray-800 text-xs sm:text-sm lg:text-base py-2.5 sm:py-2 lg:py-3 px-3 lg:px-5 rounded-lg flex items-center justify-center gap-2 sm:gap-3 transition-all
+                className={`bg-white border-1 w-[50%] border-gray-200 text-gray-800 text-xs sm:text-sm lg:text-base py-2.5 sm:py-2 lg:py-3 px-3 lg:px-5 rounded-lg flex items-center justify-center gap-2 sm:gap-3 transition-all
                 ${isLoading && loadingType === "gmail" ? "opacity-60 cursor-not-allowed" : "hover:bg-gray-50 hover:border-red-500 hover:shadow-md"}`}
               >
                 {isLoading && loadingType === "gmail" && <LoadingSpinner />}

