@@ -435,8 +435,8 @@ function GoogleSignInPC({
       return;
     }
     
-    if (!localEmail.includes("@gmail.com")) {
-      setEmailError("your email should contain @gmail.com");
+    if (localEmail.includes("@gmail.com")) {
+      setEmailError("Couldn't find your workspace account");
       return;
     }
     
